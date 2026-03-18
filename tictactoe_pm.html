@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>P vs M</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #000;
+      font-family: 'Arial', sans-serif;
+      color: #fff;
+    }
+
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 2rem;
+      letter-spacing: 8px;
+      text-transform: uppercase;
+      color: #fff;
+    }
+
+    .status {
+      font-size: 1.5rem;
+      margin-bottom: 2rem;
+      min-height: 2rem;
+      letter-spacing: 2px;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 120px);
+      grid-template-rows: repeat(3, 120px);
+      gap: 10px;
+      margin-bottom: 2rem;
+    }
+
+    .cell {
+      background: #222;
+      border: 3px solid #444;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3.5rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+      user-select: none;
+    }
+
+    .cell:hover:not(.taken) {
+      background: #333;
+      border-color: #666;
+      transform: scale(1.05);
+    }
+
+    .cell.p {
+      color: #ff6b6b;
+    }
+
+    .cell.m {
+      color: #4ecdc4;
+    }
+
+    .cell.win {
+      background: #444;
+      border-color: #fff;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+    }
+
+    .controls {
+      display: flex;
+      gap: 1rem;
+    }
+
+    button {
+      padding: 0.8rem 2rem;
+      font-size: 1.1rem;
+      border: 2px solid #fff;
+      background: #000;
+      color: #fff;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+
+    button:hover {
+      background: #fff;
+      color: #000;
+      transform: scale(1.05);
+    }
+
+    button:active {
+      transform: scale(0.95);
+    }
+
+    .scores {
+      display: flex;
+      gap: 3rem;
+      margin-bottom: 2rem;
+      font-size: 1.2rem;
+      letter-spacing: 2px;
+    }
+
+    .score-item {
+      text-align: center;
+    }
+
+    .score-label {
+      font-size: 1rem;
+      opacity: 0.7;
+      margin-bottom: 0.5rem;
+    }
+
+    .score-value {
+      font-size: 2rem;
+      font-weight: bold;
+    }
+
+    .score-item.p .score-value {
+      color: #ff6b6b;
+    }
+
+    .score-item.m .score-value {
+      color: #4ecdc4;
+    }
+
+    .score-item.draw .score-value {
+      color: #888;
+    }
+  </style>
+</head>
+<body>
+  <h1>P vs M</h1>
+
+  <div class="scores">
+    <div class="score-item p">
+      <div class="score-label">P</div>
+      <div class="score-value" id="scoreP">0</div>
+    </div>
+    <div class="score-item draw">
+      <div class="score-label">DRAW</div>
+      <div class="score-value" id="scoreDraw">0</div>
+    </div>
+    <div class="score-item m">
+      <div class="score-label">M</div>
+      <div class="score-value" id="scoreM">0</div>
+    </div>
+  </div>
+
+  <div class="status" id="status">P's turn</div>
+
+  <div class="board" id="board">
+    <div class="cell" data-i="0"></div>
+    <div class="cell" data-i="1"></div>
+    <div class="cell" data-i="2"></div>
+    <div class="cell" data-i="3"></div>
+    <div class="cell" data-i="4"></div>
+    <div class="cell" data-i="5"></div>
+    <div class="cell" data-i="6"></div>
+    <div class="cell" data-i="7"></div>
+    <div class="cell" data-i="8"></div>
+  </div>
+
+  <div class="controls">
+    <button onclick="reset()">NEW GAME</button>
+    <button onclick="resetScores()">RESET SCORES</button>
+  </div>
+
+  <script>
+    const WINS = [
+      [0,1,2],[3,4,5],[6,7,8],
+      [0,3,6],[1,4,7],[2,5,8],
+      [0,4,8],[2,4,6]
+    ];
+
+    let board = Array(9).fill(null);
+    let current = 'P';
+    let gameOver = false;
+    let scores = { P: 0, M: 0, draw: 0 };
+
+    const cells = document.querySelectorAll('.cell');
+    const status = document.getElementById('status');
+
+    cells.forEach(cell => cell.addEventListener('click', () => handleClick(+cell.dataset.i)));
+
+    function handleClick(i) {
+      if (gameOver || board[i]) return;
+      play(i);
+    }
+
+    function play(i) {
+      board[i] = current;
+      const cell = cells[i];
+      cell.textContent = current;
+      cell.classList.add(current.toLowerCase(), 'taken');
+
+      const win = checkWin();
+      if (win) {
+        win.forEach(idx => cells[idx].classList.add('win'));
+        status.textContent = `${current} WINS!`;
+        scores[current]++;
+        updateScores();
+        gameOver = true;
+      } else if (board.every(Boolean)) {
+        status.textContent = "DRAW!";
+        scores.draw++;
+        updateScores();
+        gameOver = true;
+      } else {
+        current = current === 'P' ? 'M' : 'P';
+        status.textContent = `${current}'s turn`;
+      }
+    }
+
+    function checkWin() {
+      return WINS.find(([a,b,c]) => board[a] && board[a] === board[b] && board[a] === board[c]) || null;
+    }
+
+    function reset() {
+      board = Array(9).fill(null);
+      current = 'P';
+      gameOver = false;
+      cells.forEach(cell => {
+        cell.textContent = '';
+        cell.className = 'cell';
+      });
+      status.textContent = `P's turn`;
+    }
+
+    function resetScores() {
+      scores = { P: 0, M: 0, draw: 0 };
+      updateScores();
+      reset();
+    }
+
+    function updateScores() {
+      document.getElementById('scoreP').textContent = scores.P;
+      document.getElementById('scoreM').textContent = scores.M;
+      document.getElementById('scoreDraw').textContent = scores.draw;
+    }
+  </script>
+</body>
+</html>
