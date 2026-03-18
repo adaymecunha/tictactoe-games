@@ -11,6 +11,31 @@ This repository contains two standalone tic-tac-toe games implemented as self-co
 
 Both games are single-file HTML applications with inline CSS and JavaScript. No build process, package manager, or external dependencies are required.
 
+## GitHub Repository
+
+**Repository:** https://github.com/adaymecunha/tictactoe-games
+
+All changes are tracked in git with clean commit messages. This allows easy reverting and maintains a complete project history.
+
+### Git Workflow
+
+When making changes:
+
+```bash
+# Make your code changes, then:
+git add <files>           # Stage changes
+git commit -m "Description of change"
+git push origin master    # Push to GitHub
+```
+
+### Viewing History
+
+```bash
+git log                   # View commit history
+git diff HEAD~1          # Compare current with last commit
+git checkout <hash>      # Revert to a specific commit
+```
+
 ## Running the Games
 
 Open either HTML file directly in a web browser:
