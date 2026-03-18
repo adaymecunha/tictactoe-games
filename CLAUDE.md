@@ -4,12 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This repository contains two standalone tic-tac-toe games implemented as self-contained HTML files:
+This repository contains a single tic-tac-toe game implemented as a self-contained HTML file:
 
 - **tictactoe.html** - Full-featured tic-tac-toe with 2-player (PvP) and vs AI modes
-- **tictactoe_pm.html** - Simpler 2-player tic-tac-toe variant (P vs M)
 
-Both games are single-file HTML applications with inline CSS and JavaScript. No build process, package manager, or external dependencies are required.
+It is a single-file HTML application with inline CSS and JavaScript. No build process, package manager, or external dependencies are required.
 
 ## GitHub Repository
 
